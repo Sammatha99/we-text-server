@@ -45,9 +45,22 @@ const updateUserDetailArray = {
   }),
 };
 
+const getUsersArrayOfUserDetail = {
+  params: Joi.object().keys({
+    userId: Joi.required().custom(objectId),
+  }),
+  body: Joi.object().keys({
+    role: Joi.string(),
+    sortBy: Joi.string(),
+    limit: Joi.number().integer(),
+    page: Joi.number().integer(),
+  }),
+};
+
 module.exports = {
   createUserDetail,
   updateUserDetail,
   updateUserDetailArray,
   getUserDetail,
+  getUsersArrayOfUserDetail,
 };

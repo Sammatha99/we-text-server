@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { UserDetail } = require('../models');
+const { UserDetail, User } = require('../models');
 const userService = require('./user.service');
 const ApiError = require('../utils/ApiError');
 
@@ -18,16 +18,93 @@ const getUserDetail = async (id) => {
  * @returns {Promise<UserDetail>}
  */
 const getUserDetailById = async (id) => {
-  return UserDetail.findById(id)
-    .populate({
-      path: 'playlistPopulate',
-      populate: {
-        path: 'songsPopulate',
-      },
-    })
-    .populate({ path: 'followersPopulate', select: 'id name avatar status' })
-    .populate({ path: 'followingsPopulate', select: 'id name avatar status' })
-    .populate({ path: 'contactsPopulate', select: 'id name avatar status' });
+  return UserDetail.findById(id).populate({
+    path: 'playlistPopulate',
+    populate: {
+      path: 'songsPopulate',
+    },
+  });
+  // .populate({ path: 'followersPopulate', select: 'id name avatar status' })
+  // .populate({ path: 'followingsPopulate', select: 'id name avatar status' })
+  // .populate({ path: 'contactsPopulate', select: 'id name avatar status' });
+};
+
+/**
+ * get followers of user by id
+ * @param {ObjectId} id
+ * @param {Object} filter - Mongo filter
+ * @param {Object} options - Query options
+ * @param {string} [options.sortBy] - Sort option in the format: sortField:(desc|asc)
+ * @param {number} [options.limit] - Maximum number of results per page (default = 10)
+ * @param {number} [options.page] - Current page (default = 1)
+ * @returns {Promise<User>}
+ */
+const getFollowersOfUserById = async (id, filter, options) => {
+  const usersMeetCondition = {};
+  if (id) {
+    const thisUser = await UserDetail.findById(id);
+    if (!thisUser) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'User invalid');
+    }
+    const followers = thisUser.followers || [];
+    Object.assign(usersMeetCondition, { _id: { $in: followers } });
+  }
+  Object.assign(filter, usersMeetCondition);
+
+  const users = await User.paginate(filter, options);
+  return users;
+};
+
+/**
+ * get followings of user by id
+ * @param {ObjectId} id
+ * @param {Object} filter - Mongo filter
+ * @param {Object} options - Query options
+ * @param {string} [options.sortBy] - Sort option in the format: sortField:(desc|asc)
+ * @param {number} [options.limit] - Maximum number of results per page (default = 10)
+ * @param {number} [options.page] - Current page (default = 1)
+ * @returns {Promise<User>}
+ */
+const getFollowingsOfUserById = async (id, filter, options) => {
+  const usersMeetCondition = {};
+  if (id) {
+    const thisUser = await UserDetail.findById(id);
+    if (!thisUser) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'User invalid');
+    }
+    const followings = thisUser.followings || [];
+    Object.assign(usersMeetCondition, { _id: { $in: followings } });
+  }
+  Object.assign(filter, usersMeetCondition);
+
+  const users = await User.paginate(filter, options);
+  return users;
+};
+
+/**
+ * get contacts of user by id
+ * @param {ObjectId} id
+ * @param {Object} filter - Mongo filter
+ * @param {Object} options - Query options
+ * @param {string} [options.sortBy] - Sort option in the format: sortField:(desc|asc)
+ * @param {number} [options.limit] - Maximum number of results per page (default = 10)
+ * @param {number} [options.page] - Current page (default = 1)
+ * @returns {Promise<User>}
+ */
+const getContactsOfUserById = async (id, filter, options) => {
+  const usersMeetCondition = {};
+  if (id) {
+    const thisUser = await UserDetail.findById(id);
+    if (!thisUser) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'User invalid');
+    }
+    const contacts = thisUser.contacts || [];
+    Object.assign(usersMeetCondition, { _id: { $in: contacts } });
+  }
+  Object.assign(filter, usersMeetCondition);
+
+  const users = await User.paginate(filter, options);
+  return users;
 };
 
 /**
@@ -193,4 +270,7 @@ module.exports = {
   addUserToFollowings,
   deleteUserOutOfContacts,
   addUserToContacts,
+  getFollowersOfUserById,
+  getFollowingsOfUserById,
+  getContactsOfUserById,
 };

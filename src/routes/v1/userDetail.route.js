@@ -15,6 +15,33 @@ router
   .patch(auth('manageUsers'), validate(userDetailValidation.updateUserDetail), userDetailController.updateUserDetailById)
   .get(validate(userDetailValidation.getUserDetail), userDetailController.getUserDetailById);
 
+// get followers
+router
+  .route('/:userId/followers')
+  .get(
+    auth('manageUsers'),
+    validate(userDetailValidation.getUsersArrayOfUserDetail),
+    userDetailController.getFollowersOfUserById
+  );
+
+// get followings
+router
+  .route('/:userId/followings')
+  .get(
+    auth('manageUsers'),
+    validate(userDetailValidation.getUsersArrayOfUserDetail),
+    userDetailController.getFollowingsOfUserById
+  );
+
+// get contacts
+router
+  .route('/:userId/contacts')
+  .get(
+    auth('manageUsers'),
+    validate(userDetailValidation.getUsersArrayOfUserDetail),
+    userDetailController.getContactsOfUserById
+  );
+
 // thêm/xóa followers-followings-contacts
 router
   .route('/:userId/delete-follower')

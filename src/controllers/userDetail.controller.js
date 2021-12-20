@@ -1,10 +1,35 @@
 const httpStatus = require('http-status');
+const pick = require('../utils/pick');
 const catchAsync = require('../utils/catchAsync');
 const { userDetailService } = require('../services');
 
 const getUserDetailById = catchAsync(async (req, res) => {
-  const userDetail = userDetailService.getUserDetailById(req.params.userId);
+  const userDetail = await userDetailService.getUserDetailById(req.params.userId);
   res.send(userDetail);
+});
+
+const getFollowersOfUserById = catchAsync(async (req, res) => {
+  const filter = pick(req.query, ['role']);
+  const options = pick(req.query, ['sortBy', 'limit', 'page']);
+  const { userId } = req.params;
+  const users = await userDetailService.getFollowersOfUserById(userId, filter, options);
+  res.send(users);
+});
+
+const getFollowingsOfUserById = catchAsync(async (req, res) => {
+  const filter = pick(req.query, ['role']);
+  const options = pick(req.query, ['sortBy', 'limit', 'page']);
+  const { userId } = req.params;
+  const users = await userDetailService.getFollowingsOfUserById(userId, filter, options);
+  res.send(users);
+});
+
+const getContactsOfUserById = catchAsync(async (req, res) => {
+  const filter = pick(req.query, ['role']);
+  const options = pick(req.query, ['sortBy', 'limit', 'page']);
+  const { userId } = req.params;
+  const users = await userDetailService.getContactsOfUserById(userId, filter, options);
+  res.send(users);
 });
 
 const createUserDetail = catchAsync(async (req, res) => {
@@ -50,6 +75,9 @@ const addUserToContacts = catchAsync(async (req, res) => {
 
 module.exports = {
   getUserDetailById,
+  getFollowersOfUserById,
+  getFollowingsOfUserById,
+  getContactsOfUserById,
   createUserDetail,
   updateUserDetailById,
   deleteUserOutOfFollowers,

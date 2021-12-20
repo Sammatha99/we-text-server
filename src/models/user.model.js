@@ -44,10 +44,12 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      default:
+        'https://firebasestorage.googleapis.com/v0/b/we-text-c82e4.appspot.com/o/userAvatars%2FdefaultAvatar.png?alt=media&token=d6d53533-3008-4173-96ed-cff4f08c85d0',
     },
     status: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     isEmailVerified: {
       type: Boolean,

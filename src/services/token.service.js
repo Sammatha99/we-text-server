@@ -119,6 +119,7 @@ const generateVerifyEmailToken = async (user) => {
  * @returns {Promise<string>}
  */
 const generateOTPEmailToken = async (id) => {
+  await Token.deleteMany({ user: id, type: tokenTypes.VERIFY_EMAIL });
   const expires = moment().add(config.jwt.verifyEmailExpirationMinutes, 'minutes');
   const digits = '0123456789';
   let verifyEmailToken = '';
