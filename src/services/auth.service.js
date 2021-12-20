@@ -61,11 +61,11 @@ const resetPassword = async (id, password, newPassword) => {
   try {
     const user = await userService.getUserById(id);
     if (!user || !(await user.isPasswordMatch(password))) {
-      throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect password');
+      throw new Error();
     }
     await userService.updateUserById(user.id, { password: newPassword });
   } catch (error) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Password reset failed');
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect old password');
   }
 };
 
