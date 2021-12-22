@@ -27,10 +27,10 @@ const updateUserDetail = {
   }),
   body: Joi.object()
     .keys({
-      description: Joi.string(),
-      address: Joi.string(),
-      phoneNumber: Joi.string(),
-      playlist: Joi.string(),
+      description: Joi.string().allow('', null),
+      address: Joi.string().allow('', null),
+      phoneNumber: Joi.string().allow('', null),
+      playlist: Joi.string().allow('', null),
     })
     .min(1),
 };

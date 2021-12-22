@@ -13,7 +13,7 @@ const userDetailSchema = mongoose.Schema(
       type: String,
       maxlength: 12,
       validate(value) {
-        if (!value.match(/\d/) || !value.match(/[0-9]/)) {
+        if (value.length !== 0 && (!value.match(/\d/) || !value.match(/[0-9]/))) {
           throw new Error('phone number must contain only number');
         }
       },

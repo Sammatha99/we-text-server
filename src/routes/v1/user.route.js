@@ -13,7 +13,7 @@ router.route('/').get(validate(userValidation.getUsers), userController.getUsers
 // update user by id
 router
   .route('/:userId')
-  .get(auth('manageUsers'), validate(userValidation.getUser), userController.getUser)
+  .get(validate(userValidation.getUser), userController.getUser)
   .patch(auth('manageUsers'), validate(userValidation.updateUser), userController.updateUser);
 
 module.exports = router;
