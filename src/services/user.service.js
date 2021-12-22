@@ -133,7 +133,7 @@ const updateEmail = async (userId, email) => {
   if (await User.isEmailTaken(email, userId)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
   }
-  Object.assign(user, { email });
+  Object.assign(user, { email, isEmailVerified: false });
   await user.save();
   return user;
 };
