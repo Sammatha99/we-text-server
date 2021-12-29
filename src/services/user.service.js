@@ -25,15 +25,20 @@ const createUser = async (userBody) => {
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
-const queryUsers = async (userId, search, filter, options) => {
+const queryUsers = async (userId, type, search, filter, options) => {
   const usersMeetCondition = {};
   if (userId) {
     const thisUser = await UserDetail.findById(userId);
     if (!thisUser) {
       throw new ApiError(httpStatus.NOT_FOUND, 'User invalid');
     }
-    const contacts = thisUser.contacts || [];
-    Object.assign(usersMeetCondition, { _id: { $in: contacts } });
+    if (type) {
+      const typeCondition = thisUser[type] || [];
+      Object.assign(usersMeetCondition, { _id: { $in: typeCondition } });
+    } else {
+      const contacts = thisUser.contacts || [];
+      Object.assign(usersMeetCondition, { _id: { $in: contacts } });
+    }
   }
   if (search) {
     Object.assign(usersMeetCondition, { $text: { $search: `"${search}"` } });

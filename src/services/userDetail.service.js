@@ -250,7 +250,7 @@ const addUserToContacts = async (userId, contactId) => {
   }
   const contact = await userService.getUserById(contactId);
   if (!contact) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'contact not found');
+    throw new ApiError(httpStatus.NOT_FOUND, 'Contact not found');
   }
   if (!userDetail.contacts.includes(contactId)) {
     userDetail.contacts.push(contactId);

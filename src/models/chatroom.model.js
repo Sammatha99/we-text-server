@@ -70,7 +70,7 @@ chatroomSchema.plugin(paginate);
  * @returns {Promise<boolean>}
  */
 chatroomSchema.statics.isPeerToPeerExist = async function (userIds) {
-  const chatroom = await this.findOne({ members: userIds, isGroupChat: false });
+  const chatroom = await this.findOne({ members: { $in: userIds }, isGroupChat: false });
   return chatroom;
 };
 

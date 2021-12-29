@@ -11,8 +11,9 @@ const createUser = {
 };
 
 const getUsers = {
-  body: Joi.object().keys({
+  query: Joi.object().keys({
     userId: Joi.string(),
+    type: Joi.string().valid('contacts', 'followings', 'followers'),
     search: Joi.string(),
     role: Joi.string(),
     sortBy: Joi.string(),

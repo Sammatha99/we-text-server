@@ -55,11 +55,13 @@ const addUserToFollowers = catchAsync(async (req, res) => {
 
 const deleteUserOutOfFollowings = catchAsync(async (req, res) => {
   await userDetailService.deleteUserOutOfFollowings(req.params.userId, req.body.userId);
+  await userDetailService.deleteUserOutOfFollowers(req.body.userId, req.params.userId);
   res.status(httpStatus.NO_CONTENT).send();
 });
 
 const addUserToFollowings = catchAsync(async (req, res) => {
   const userDetail = await userDetailService.addUserToFollowings(req.params.userId, req.body.userId);
+  await userDetailService.addUserToFollowers(req.body.userId, req.params.userId);
   res.send(userDetail);
 });
 

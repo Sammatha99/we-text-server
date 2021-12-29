@@ -23,11 +23,15 @@ const createChatroom = async (chatroomBody) => {
   if (!chatroomBody.isGroupChat) {
     const chatroom = await Chatroom.isPeerToPeerExist(chatroomBody.members);
     if (chatroom) {
-      return chatroom;
+      return { id: chatroom.id, isExist: true };
     }
   }
   const uniqueMembers = new Set(chatroomBody.members);
   Object.assign(chatroomBody, { members: [...uniqueMembers] });
+
+  if (!chatroomBody.time) {
+    Object.assign(chatroomBody, { time: Date.now() });
+  }
   return Chatroom.create(chatroomBody);
 };
 
@@ -61,6 +65,12 @@ const queryChatrooms = async (userId, search, filter, options) => {
     const orConditions = [{ $text: { $search: `"${search}"` } }, { members: { $in: userIds } }];
     conditions.push({ $or: orConditions });
   }
+
+  // auto sort by time if sortBy == null
+  if (!options.sortBy) {
+    Object.assign(options, { sortBy: 'time:desc' });
+  }
+
   Object.assign(filter, { $and: conditions });
 
   const chatrooms = await Chatroom.paginate(filter, options);
