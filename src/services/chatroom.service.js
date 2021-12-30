@@ -32,7 +32,14 @@ const createChatroom = async (chatroomBody) => {
   if (!chatroomBody.time) {
     Object.assign(chatroomBody, { time: Date.now() });
   }
-  return Chatroom.create(chatroomBody);
+  let chatroom = await Chatroom.create(chatroomBody);
+  chatroom = await chatroom
+    .populate({ path: 'membersPopulate', select: 'id name avatar status' })
+    .populate({ path: 'outGroupMembersPopulate', select: 'id name avatar status' })
+    .populate({ path: 'lastMessagePopulate', select: 'text sender type time' })
+    .execPopulate();
+
+  return chatroom;
 };
 
 /**
