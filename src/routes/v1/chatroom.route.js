@@ -20,10 +20,17 @@ router
   .get(auth('manageChatrooms'), validate(chatroomValidation.getChatroom), chatroomController.getChatRoomById)
   .patch(auth('manageChatrooms'), validate(chatroomValidation.updateChatroomName), chatroomController.updateChatroomName);
 
-// add / delete member to chatroom
+// get chatroom's share files by chatroomId
 router
-  .route('/:chatroomId/add-member')
-  .patch(auth('manageChatrooms'), validate(chatroomValidation.updateChatroomMember), chatroomController.addMemberToChatroom);
+  .route('/:chatroomId/files')
+  .get(auth('manageChatrooms'), validate(chatroomValidation.getShareFiles), chatroomController.getShareFiles);
+
+// add / delete member to chatroom
+router.route('/:chatroomId/add-member').patch(
+  // auth('manageChatrooms'),
+  validate(chatroomValidation.updateChatroomMembers),
+  chatroomController.addMembersToChatroom
+);
 
 router
   .route('/:chatroomId/delete-member')

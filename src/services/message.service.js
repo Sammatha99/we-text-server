@@ -6,7 +6,28 @@ const { Message } = require('../models');
  * @returns {Promise<Message>}
  */
 const createMessage = async (messageBody) => {
+  if (!messageBody.time) {
+    Object.assign(messageBody, { time: Date.now() });
+  }
   return Message.create(messageBody);
+};
+
+/**
+ * get chatroom's share files by chatroomId, sort by time
+ * @param {*} chatroomId
+ * @param {Object} filter
+ * @param {Object} options
+ * @param {string} [options.sortBy]
+ * @param {number} [options.limit]
+ * @param {number} [options.page]
+ * @returns {Promise<QueryResult}
+ * @returns
+ */
+const getShareFiles = async (chatroomId, filter, options) => {
+  Object.assign(options, { sortBy: 'time:desc', select: 'id text type' });
+  Object.assign(filter, { $and: [{ chatroomId }, { type: { $in: ['image', 'video'] } }] });
+  const messages = await Message.paginate(filter, options);
+  return messages;
 };
 
 /**
@@ -30,4 +51,5 @@ const getMessages = async (chatroomId, filter, options) => {
 module.exports = {
   createMessage,
   getMessages,
+  getShareFiles,
 };

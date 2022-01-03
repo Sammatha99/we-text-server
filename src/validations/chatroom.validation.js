@@ -18,6 +18,13 @@ const createChatroom = {
   }),
 };
 
+const getShareFiles = {
+  params: Joi.object().keys({
+    chatroomId: Joi.string().custom(objectId),
+  }),
+  query: Joi.object().keys({ page: Joi.number().integer(), limit: Joi.number().integer() }),
+};
+
 const getChatrooms = {
   query: Joi.object().keys({
     userId: Joi.string().required(),
@@ -33,7 +40,7 @@ const updateChatroomName = {
     chatroomId: Joi.string().custom(objectId),
   }),
   body: Joi.object().keys({
-    name: Joi.boolean().required(),
+    name: Joi.string().required(),
   }),
 };
 
@@ -42,7 +49,16 @@ const updateChatroomMember = {
     chatroomId: Joi.string().custom(objectId),
   }),
   body: Joi.object().keys({
-    userId: Joi.boolean().required(),
+    userId: Joi.string().required(),
+  }),
+};
+
+const updateChatroomMembers = {
+  params: Joi.object().keys({
+    chatroomId: Joi.string().custom(objectId),
+  }),
+  body: Joi.object().keys({
+    usersId: Joi.array().required(),
   }),
 };
 
@@ -61,5 +77,7 @@ module.exports = {
   getChatrooms,
   updateChatroomName,
   updateChatroomMember,
+  updateChatroomMembers,
   updateChatroomSeenHistory,
+  getShareFiles,
 };

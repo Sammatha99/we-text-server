@@ -1,5 +1,6 @@
 const httpStatus = require('http-status');
 const { Chatroom, User, UserDetail } = require('../models');
+const { createMessage } = require('./message.service');
 const ApiError = require('../utils/ApiError');
 
 /**
@@ -34,8 +35,8 @@ const createChatroom = async (chatroomBody) => {
   }
   let chatroom = await Chatroom.create(chatroomBody);
   chatroom = await chatroom
-    .populate({ path: 'membersPopulate', select: 'id name avatar status' })
-    .populate({ path: 'outGroupMembersPopulate', select: 'id name avatar status' })
+    .populate({ path: 'membersPopulate', select: 'id name avatar email status' })
+    .populate({ path: 'outGroupMembersPopulate', select: 'id name avatar email status' })
     .populate({ path: 'lastMessagePopulate', select: 'text sender type time' })
     .execPopulate();
 
@@ -102,29 +103,47 @@ const updateChatroomName = async (newName, chatroomId) => {
 
 /**
  * add member to chat room
- * @param {String} userId
+ * @param {Array} usersId
  * @param {String} chatroomId
  * @returns {Promise<Chatroom>}
  */
-const addMemberToChatroom = async (userId, chatroomId) => {
+const addMembersToChatroom = async (usersId, chatroomId) => {
   const chatroom = await Chatroom.findById(chatroomId);
   if (!chatroom) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Chatroom not found');
   }
-  const user = await User.findById(userId);
-  if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'user not found');
-  }
-  if (!chatroom.members.includes(userId)) {
-    chatroom.members.push(userId);
-  }
-  if (chatroom.outGroupMembers.includes(userId)) {
-    const newOutGroupMembers = chatroom.outGroupMembers.filter((memberId) => memberId !== userId);
-    Object.assign(chatroom, { outGroupMembers: newOutGroupMembers });
-  }
+
+  await Promise.all(
+    usersId.map(async (userId) => {
+      const user = await User.findById(userId);
+      if (!user) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'user not found');
+      }
+      const newMessage = {
+        text: 'joined group',
+        type: 'notify',
+        sender: userId,
+        chatroomId,
+        time: Date.now(),
+      };
+      createMessage(newMessage);
+      if (!chatroom.members.includes(userId)) {
+        chatroom.members.push(userId);
+      }
+      if (chatroom.outGroupMembers.includes(userId)) {
+        const newOutGroupMembers = chatroom.outGroupMembers.filter((memberId) => memberId !== userId);
+        Object.assign(chatroom, { outGroupMembers: newOutGroupMembers });
+      }
+    })
+  );
+
+  Object.assign(chatroom, { time: Date.now() });
 
   await chatroom.save();
-  return chatroom;
+  return chatroom
+    .populate({ path: 'membersPopulate', select: 'id name avatar status email' })
+    .populate({ path: 'outGroupMembersPopulate', select: 'id name avatar status email' })
+    .execPopulate();
 };
 
 /**
@@ -139,12 +158,22 @@ const deleteMemberOutOfChatroom = async (userId, chatroomId) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Chatroom not found');
   }
 
+  const newMessage = {
+    text: 'left group',
+    type: 'notify',
+    sender: userId,
+    chatroomId,
+    time: Date.now(),
+  };
+
+  createMessage(newMessage);
+
   if (!chatroom.outGroupMembers.includes(userId)) {
     chatroom.outGroupMembers.push(userId);
   }
 
   const newMembers = chatroom.members.filter((memberId) => memberId !== userId);
-  Object.assign(chatroom, { members: newMembers });
+  Object.assign(chatroom, { members: newMembers, time: Date.now() });
 
   await chatroom.save();
   return chatroom;
@@ -172,12 +201,12 @@ const updateSeenHistory = async (userIdMessageId, chatroomId) => {
  * @param {String} messageId
  * @returns {Promise<Chatroom>}
  */
-const updateLastMessage = async (messageId, chatroomId) => {
+const updateLastMessage = async (messageId, time, chatroomId) => {
   const chatroom = await Chatroom.findById(chatroomId);
   if (!chatroom) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Chatroom not found');
   }
-  Object.assign(chatroom, { lastMessage: messageId });
+  Object.assign(chatroom, { lastMessage: messageId, time });
   await chatroom.save();
   return chatroom;
 };
@@ -202,7 +231,7 @@ module.exports = {
   createChatroom,
   queryChatrooms,
   updateChatroomName,
-  addMemberToChatroom,
+  addMembersToChatroom,
   deleteMemberOutOfChatroom,
   updateSeenHistory,
   updateLastMessage,

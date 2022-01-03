@@ -5,7 +5,7 @@ const createMessage = {
     text: Joi.string().required(),
     type: Joi.string().required().valid('notify', 'text', 'image', 'video', 'file', 'record'),
     sender: Joi.string().required(),
-    time: Joi.number().default(Date.now()),
+    time: Joi.number(),
     chatroomId: Joi.string().required(),
   }),
 };

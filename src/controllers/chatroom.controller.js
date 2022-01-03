@@ -1,7 +1,7 @@
 const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const catchAsync = require('../utils/catchAsync');
-const { chatroomService } = require('../services');
+const { chatroomService, messageService } = require('../services');
 
 const getChatRoomById = catchAsync(async (req, res) => {
   const chatroom = await chatroomService.getChatRoomById(req.params.chatroomId);
@@ -11,6 +11,14 @@ const getChatRoomById = catchAsync(async (req, res) => {
 const createChatroom = catchAsync(async (req, res) => {
   const chatroom = await chatroomService.createChatroom(req.body);
   res.status(httpStatus.CREATED).send(chatroom);
+});
+
+const getShareFiles = catchAsync(async (req, res) => {
+  const filter = {};
+  const options = pick(req.query, ['page', 'limit']);
+  const { chatroomId } = req.params;
+  const files = await messageService.getShareFiles(chatroomId, filter, options);
+  res.send(files);
 });
 
 const getChatrooms = catchAsync(async (req, res) => {
@@ -26,8 +34,8 @@ const updateChatroomName = catchAsync(async (req, res) => {
   res.send(chatroom);
 });
 
-const addMemberToChatroom = catchAsync(async (req, res) => {
-  const chatroom = await chatroomService.addMemberToChatroom(req.body.userId, req.params.chatroomId);
+const addMembersToChatroom = catchAsync(async (req, res) => {
+  const chatroom = await chatroomService.addMembersToChatroom(req.body.usersId, req.params.chatroomId);
   res.send(chatroom);
 });
 
@@ -44,9 +52,10 @@ const updateSeenHistory = catchAsync(async (req, res) => {
 module.exports = {
   getChatRoomById,
   createChatroom,
+  getShareFiles,
   getChatrooms,
   updateChatroomName,
-  addMemberToChatroom,
+  addMembersToChatroom,
   deleteMemberOutOfChatroom,
   updateSeenHistory,
 };

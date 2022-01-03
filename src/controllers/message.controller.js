@@ -6,7 +6,7 @@ const { messageService, chatroomService } = require('../services');
 const createMessage = catchAsync(async (req, res) => {
   await chatroomService.checkIsUserInChatroom(req.body.chatroomId, req.body.sender);
   const message = await messageService.createMessage(req.body);
-  await chatroomService.updateLastMessage(message.id, req.body.chatroomId);
+  await chatroomService.updateLastMessage(message.id, message.time, req.body.chatroomId);
   res.status(httpStatus.CREATED).send(message);
 });
 
