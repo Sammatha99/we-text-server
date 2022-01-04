@@ -66,11 +66,11 @@ chatroomSchema.plugin(paginate);
 
 /**
  * Check if chatroom which not groupchat is exist
- * @param {[String]} userIds - The user's email
+ * @param {[String]} userIds
  * @returns {Promise<boolean>}
  */
 chatroomSchema.statics.isPeerToPeerExist = async function (userIds) {
-  const chatroom = await this.findOne({ members: { $in: userIds }, isGroupChat: false });
+  const chatroom = await this.findOne({ members: { $all: userIds }, isGroupChat: false });
   return chatroom;
 };
 

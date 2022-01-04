@@ -26,11 +26,13 @@ router
   .get(auth('manageChatrooms'), validate(chatroomValidation.getShareFiles), chatroomController.getShareFiles);
 
 // add / delete member to chatroom
-router.route('/:chatroomId/add-member').patch(
-  // auth('manageChatrooms'),
-  validate(chatroomValidation.updateChatroomMembers),
-  chatroomController.addMembersToChatroom
-);
+router
+  .route('/:chatroomId/add-member')
+  .patch(
+    auth('manageChatrooms'),
+    validate(chatroomValidation.updateChatroomMembers),
+    chatroomController.addMembersToChatroom
+  );
 
 router
   .route('/:chatroomId/delete-member')

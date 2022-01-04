@@ -88,17 +88,32 @@ const queryChatrooms = async (userId, search, filter, options) => {
 /**
  * update chat room name
  * @param {String} newName
+ * @param {String} userId
  * @param {String} chatroomId
  * @returns {Promise<Chatroom>}
  */
-const updateChatroomName = async (newName, chatroomId) => {
+const updateChatroomName = async (userId, newName, chatroomId) => {
   const chatroom = await Chatroom.findById(chatroomId);
   if (!chatroom) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Chatroom not found');
   }
-  Object.assign(chatroom, { name: newName });
+
+  const newMessage = {
+    text: newName !== '' ? `named the group ${newName}` : 'removed the group name',
+    type: 'notify',
+    sender: userId,
+    chatroomId,
+    time: Date.now(),
+  };
+  createMessage(newMessage);
+
+  Object.assign(chatroom, { name: newName, time: Date.now() });
+
   await chatroom.save();
-  return chatroom;
+  return chatroom
+    .populate({ path: 'membersPopulate', select: 'id name avatar status email' })
+    .populate({ path: 'outGroupMembersPopulate', select: 'id name avatar status email' })
+    .execPopulate();
 };
 
 /**

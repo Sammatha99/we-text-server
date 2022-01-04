@@ -40,7 +40,8 @@ const updateChatroomName = {
     chatroomId: Joi.string().custom(objectId),
   }),
   body: Joi.object().keys({
-    name: Joi.string().required(),
+    userId: Joi.string().required(),
+    name: Joi.string().required().allow('', null),
   }),
 };
 

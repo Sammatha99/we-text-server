@@ -30,7 +30,7 @@ const getChatrooms = catchAsync(async (req, res) => {
 });
 
 const updateChatroomName = catchAsync(async (req, res) => {
-  const chatroom = await chatroomService.updateChatroomName(req.body.name, req.params.chatroomId);
+  const chatroom = await chatroomService.updateChatroomName(req.body.userId, req.body.name, req.params.chatroomId);
   res.send(chatroom);
 });
 
