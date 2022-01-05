@@ -42,7 +42,7 @@ const getShareFiles = async (chatroomId, filter, options) => {
  */
 const getMessages = async (chatroomId, filter, options) => {
   Object.assign(filter, { $and: [{ chatroomId }] });
-  Object.assign(options, { sortBy: 'time:asc' });
+  Object.assign(options, { sortBy: 'time:desc' });
 
   const messages = await Message.paginate(filter, options);
   return messages;
