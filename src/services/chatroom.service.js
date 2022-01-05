@@ -173,6 +173,11 @@ const deleteMemberOutOfChatroom = async (userId, chatroomId) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Chatroom not found');
   }
 
+  if (!chatroom.outGroupMembers.includes(userId)) {
+    chatroom.outGroupMembers.push(userId);
+  }
+
+  const newMembers = chatroom.members.filter((memberId) => memberId !== userId);
   const newMessage = {
     text: 'left group',
     type: 'notify',
@@ -183,11 +188,6 @@ const deleteMemberOutOfChatroom = async (userId, chatroomId) => {
 
   createMessage(newMessage);
 
-  if (!chatroom.outGroupMembers.includes(userId)) {
-    chatroom.outGroupMembers.push(userId);
-  }
-
-  const newMembers = chatroom.members.filter((memberId) => memberId !== userId);
   Object.assign(chatroom, { members: newMembers, time: Date.now() });
 
   await chatroom.save();
