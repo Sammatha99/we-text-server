@@ -1,4 +1,4 @@
-const { Message } = require('../models');
+const { Message, Chatroom } = require('../models');
 
 /**
  * create a message
@@ -9,7 +9,11 @@ const createMessage = async (messageBody) => {
   if (!messageBody.time) {
     Object.assign(messageBody, { time: Date.now() });
   }
-  return Message.create(messageBody);
+  const message = await Message.create(messageBody);
+  const chatroom = await Chatroom.findById(messageBody.chatroomId);
+  Object.assign(chatroom, { lastMessage: message.id });
+  await chatroom.save();
+  return message;
 };
 
 /**
@@ -42,7 +46,14 @@ const getShareFiles = async (chatroomId, filter, options) => {
  */
 const getMessages = async (chatroomId, filter, options) => {
   Object.assign(filter, { $and: [{ chatroomId }] });
-  Object.assign(options, { sortBy: 'time:desc' });
+  Object.assign(options, {
+    sortBy: 'time:desc',
+    // populate: 'senderPopulate',
+    populate: {
+      path: 'senderPopulate',
+      select: ['id', 'avatar', 'name'],
+    },
+  });
 
   const messages = await Message.paginate(filter, options);
   return messages;

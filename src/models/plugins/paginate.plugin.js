@@ -39,7 +39,7 @@ const paginate = (schema) => {
     const countPromise = this.countDocuments(filter).exec();
     let docsPromise = this.find(filter).sort(sort).skip(skip).limit(limit);
 
-    if (options.populate) {
+    if (options.populate && typeof options.populate === 'string') {
       options.populate.split(',').forEach((populateOption) => {
         docsPromise = docsPromise.populate(
           populateOption
@@ -48,6 +48,8 @@ const paginate = (schema) => {
             .reduce((a, b) => ({ path: b, populate: a }))
         );
       });
+    } else if (typeof options.populate === 'object') {
+      docsPromise = docsPromise.populate(options.populate);
     }
 
     docsPromise = docsPromise.exec();

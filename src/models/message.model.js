@@ -24,6 +24,13 @@ const messageSchema = mongoose.Schema({
   },
 });
 
+messageSchema.virtual('senderPopulate', {
+  ref: 'users',
+  localField: 'sender',
+  foreignField: '_id',
+  justOne: true,
+});
+
 messageSchema.set('toObject', { virtuals: true });
 messageSchema.set('toJSON', { virtuals: true });
 
