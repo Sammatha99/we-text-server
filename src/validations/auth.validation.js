@@ -21,6 +21,7 @@ const login = {
 const logout = {
   body: Joi.object().keys({
     refreshToken: Joi.string().required(),
+    userId: Joi.string().required(),
   }),
 };
 
@@ -65,6 +66,19 @@ const updateEmail = {
   }),
 };
 
+const updateStatus = {
+  params: Joi.object().keys({
+    userId: Joi.string().required(),
+  }),
+  query: Joi.object().keys({
+    status: Joi.boolean().required(),
+  }),
+  // body: Joi.object().keys({
+  //   userId: Joi.string().required(),
+  //   status: Joi.boolean().required(),
+  // }),
+};
+
 module.exports = {
   register,
   login,
@@ -75,4 +89,5 @@ module.exports = {
   sendVerifyEmail,
   verifyEmail,
   updateEmail,
+  updateStatus,
 };

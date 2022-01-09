@@ -4,8 +4,25 @@ const socketio = require('socket.io');
 const app = require('./app');
 const config = require('./config/config');
 const logger = require('./config/logger');
+const { userService, chatroomService } = require('./services');
 
 const server = http.createServer(app);
+
+const usersLogin = [];
+
+const usersLoginPush = (newUser) => {
+  const findIndex = usersLogin.findIndex((user) => user.userId === newUser.userId);
+  if (findIndex === -1) {
+    usersLogin.push(newUser);
+  }
+};
+
+const usersLoginRemove = (removeUser) => {
+  const findIndex = usersLogin.findIndex((user) => user.userId === removeUser.userId);
+  if (findIndex !== -1) {
+    usersLogin.splice(findIndex, 1);
+  }
+};
 
 const io = socketio(server, {
   cors: {
@@ -14,8 +31,18 @@ const io = socketio(server, {
 });
 
 io.on('connect', (socket) => {
-  // eslint-disable-next-line no-console
-  console.log('somebody connected !!!!');
+  socket.on('login', (userId) => {
+    usersLoginPush({ userId, socketId: socket.id });
+    socket.broadcast.emit('login', userId);
+    // TODO get all chatroomsId of this userId -> socket.join(room)
+  });
+
+  socket.on('logout', (userId) => {
+    userService.updateUserById(userId, { status: false });
+    usersLoginRemove({ userId, socketId: socket.id });
+    socket.broadcast.emit('logout', userId);
+    // TODO get all chatroomsId of this userId -> socket.leave(room)
+  });
 });
 
 mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {

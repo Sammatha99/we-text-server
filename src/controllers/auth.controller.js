@@ -1,25 +1,27 @@
 const httpStatus = require('http-status');
+const mongoose = require('mongoose');
 const catchAsync = require('../utils/catchAsync');
 const { authService, userService, tokenService, emailService, userDetailService } = require('../services');
 
 const register = catchAsync(async (req, res) => {
+  Object.assign(req.body, { status: true });
   const user = await userService.createUser(req.body);
   const tokens = await tokenService.generateAuthTokens(user);
   await userDetailService.createUserDetail(user.id, {});
-  // TODO 1: update user.status = true -> send socket status = true
   res.status(httpStatus.CREATED).send({ user, tokens });
 });
 
 const login = catchAsync(async (req, res) => {
   const { email, password } = req.body;
   const user = await authService.loginUserWithEmailAndPassword(email, password);
-  // TODO 1: update user.status = true -> send socket status = true
   Object.assign(user, { status: true });
   const tokens = await tokenService.generateAuthTokens(user);
   res.send({ user, tokens });
 });
 
 const logout = catchAsync(async (req, res) => {
+  const userId = mongoose.Types.ObjectId(req.body.userId);
+  await userService.updateUserById(userId, { status: false });
   await authService.logout(req.body.refreshToken);
   res.status(httpStatus.NO_CONTENT).send();
 });
@@ -57,6 +59,12 @@ const updateEmail = catchAsync(async (req, res) => {
   res.send(user);
 });
 
+const updateStatus = catchAsync(async (req, res) => {
+  // const userId = mongoose.Types.ObjectId(req.body.userId);
+  await userService.updateUserById(req.params.userId, { status: req.query.status });
+  res.status(httpStatus.NO_CONTENT).send();
+});
+
 module.exports = {
   register,
   login,
@@ -67,4 +75,5 @@ module.exports = {
   sendVerificationEmail,
   verifyEmail,
   updateEmail,
+  updateStatus,
 };
