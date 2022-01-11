@@ -232,13 +232,22 @@ const updateLastMessage = async (messageId, time, chatroomId) => {
  * @param {String} chatroomId
  * @returns {Promise<Chatroom>}
  */
-
 const checkIsUserInChatroom = async (chatroomId, userId) => {
   const chatroom = await Chatroom.findOne({ _id: chatroomId, members: userId });
   if (!chatroom) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Sender not in this chatroom');
   }
   return chatroom;
+};
+
+/**
+ * get all chatroomsId by userId
+ * @param {String} userId
+ * @returns {Promise<Array>}
+ */
+const getAllChatroomsIdByUserId = async (userId) => {
+  const chatroomsId = await Chatroom.find({ members: userId }).distinct('_id');
+  return chatroomsId;
 };
 
 module.exports = {
@@ -251,4 +260,5 @@ module.exports = {
   updateSeenHistory,
   updateLastMessage,
   checkIsUserInChatroom,
+  getAllChatroomsIdByUserId,
 };

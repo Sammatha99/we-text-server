@@ -31,17 +31,40 @@ const io = socketio(server, {
 });
 
 io.on('connect', (socket) => {
-  socket.on('login', (userId) => {
+  socket.on('login', async (userId) => {
     usersLoginPush({ userId, socketId: socket.id });
     socket.broadcast.emit('login', userId);
     // TODO get all chatroomsId of this userId -> socket.join(room)
+    const chatroomsId = await chatroomService.getAllChatroomsIdByUserId(userId);
+    const chatroomsIdString = Array.from(chatroomsId, (id) => id.toString());
+    socket.join(chatroomsIdString);
+    // chatroomsId.forEach((chatroomId) => socket.join(chatroomId));
   });
 
-  socket.on('logout', (userId) => {
+  socket.on('logout', async (userId) => {
     userService.updateUserById(userId, { status: false });
     usersLoginRemove({ userId, socketId: socket.id });
     socket.broadcast.emit('logout', userId);
     // TODO get all chatroomsId of this userId -> socket.leave(room)
+    const { rooms } = socket;
+    rooms.forEach((room) => socket.leave(room));
+  });
+
+  socket.on('create-chatroom', (senderId, chatroomId, membersId) => {
+    usersLogin.forEach((user) => {
+      if (membersId.includes(user.userId)) {
+        io.to(user.socketId).emit('new-chatroom', senderId, chatroomId);
+      }
+    });
+  });
+
+  socket.on('join-room', (chatroomId) => {
+    socket.join(chatroomId);
+  });
+
+  socket.on('send-message', (message, sender) => {
+    socket.broadcast.to(message.chatroomId).emit('receive-message', message, sender);
+    socket.broadcast.to(message.chatroomId).emit(`receive-message-${message.chatroomId}`, message, sender);
   });
 });
 

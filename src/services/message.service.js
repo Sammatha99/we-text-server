@@ -11,7 +11,7 @@ const createMessage = async (messageBody) => {
   }
   const message = await Message.create(messageBody);
   const chatroom = await Chatroom.findById(messageBody.chatroomId);
-  Object.assign(chatroom, { lastMessage: message.id });
+  Object.assign(chatroom, { lastMessage: message.id, time: message.time });
   await chatroom.save();
   return message;
 };
@@ -48,7 +48,6 @@ const getMessages = async (chatroomId, filter, options) => {
   Object.assign(filter, { $and: [{ chatroomId }] });
   Object.assign(options, {
     sortBy: 'time:desc',
-    // populate: 'senderPopulate',
     populate: {
       path: 'senderPopulate',
       select: ['id', 'avatar', 'name'],
