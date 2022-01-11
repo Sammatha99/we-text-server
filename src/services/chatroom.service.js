@@ -53,7 +53,7 @@ const createChatroom = async (chatroomBody) => {
  * @returns {Promise<QueryResult}
  */
 const queryChatrooms = async (userId, search, filter, options) => {
-  Object.assign(options, { populate: 'membersPopulate, lastMessagePopulate' });
+  Object.assign(options, { populate: 'membersPopulate, outGroupMembersPopulate, lastMessagePopulate' });
   const conditions = [{ members: userId }];
 
   if (search) {

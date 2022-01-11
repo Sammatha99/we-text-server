@@ -66,6 +66,21 @@ io.on('connect', (socket) => {
     socket.broadcast.to(message.chatroomId).emit('receive-message', message, sender);
     socket.broadcast.to(message.chatroomId).emit(`receive-message-${message.chatroomId}`, message, sender);
   });
+
+  socket.on('send-add-member', (chatroomId, lastMessageId, time, newMembersId) => {
+    // gửi cho Global
+    io.to(chatroomId).emit('receive-add-member', chatroomId);
+
+    // gửi cho chat body
+    io.to(chatroomId).emit(`receive-add-member-${chatroomId}`, chatroomId, lastMessageId, time, newMembersId);
+
+    // mời các thành viên mới vào
+    usersLogin.forEach((user) => {
+      if (newMembersId.includes(user.userId)) {
+        io.to(user.socketId).emit('join-new-chatroom', '', chatroomId);
+      }
+    });
+  });
 });
 
 mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
