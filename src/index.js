@@ -86,6 +86,11 @@ io.on('connect', (socket) => {
     socket.broadcast.to(message.chatroomId).emit('receive-remove-member', message, sender);
     socket.broadcast.to(message.chatroomId).emit(`receive-message-${message.chatroomId}`, message, sender);
   });
+
+  socket.on('send-chatroom-name', (newName, message, sender) => {
+    socket.broadcast.to(message.chatroomId).emit('receive-chatroom-name', newName, message);
+    io.to(message.chatroomId).emit(`receive-message-${message.chatroomId}`, message, sender);
+  });
 });
 
 mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {

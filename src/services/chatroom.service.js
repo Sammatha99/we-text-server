@@ -105,14 +105,15 @@ const updateChatroomName = async (userId, newName, chatroomId) => {
     chatroomId,
     time: Date.now(),
   };
-  createMessage(newMessage);
+  const res = await createMessage(newMessage);
 
-  Object.assign(chatroom, { name: newName, time: Date.now() });
+  Object.assign(chatroom, { name: newName, time: Date.now(), lastMessage: res.id });
 
   await chatroom.save();
   return chatroom
     .populate({ path: 'membersPopulate', select: 'id name avatar status email' })
     .populate({ path: 'outGroupMembersPopulate', select: 'id name avatar status email' })
+    .populate({ path: 'lastMessagePopulate' })
     .execPopulate();
 };
 
