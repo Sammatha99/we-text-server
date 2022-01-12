@@ -186,12 +186,12 @@ const deleteMemberOutOfChatroom = async (userId, chatroomId) => {
     time: Date.now(),
   };
 
-  createMessage(newMessage);
+  const res = await createMessage(newMessage);
 
-  Object.assign(chatroom, { members: newMembers, time: Date.now() });
+  Object.assign(chatroom, { members: newMembers, lastMessage: res.id });
 
   await chatroom.save();
-  return chatroom;
+  return chatroom.populate({ path: 'lastMessagePopulate' }).execPopulate();
 };
 
 /**

@@ -77,9 +77,14 @@ io.on('connect', (socket) => {
     // mời các thành viên mới vào
     usersLogin.forEach((user) => {
       if (newMembersId.includes(user.userId)) {
-        io.to(user.socketId).emit('join-new-chatroom', '', chatroomId);
+        io.to(user.socketId).emit('new-chatroom', '', chatroomId);
       }
     });
+  });
+
+  socket.on('send-remove-member', (message, sender) => {
+    socket.broadcast.to(message.chatroomId).emit('receive-remove-member', message, sender);
+    socket.broadcast.to(message.chatroomId).emit(`receive-message-${message.chatroomId}`, message, sender);
   });
 });
 
