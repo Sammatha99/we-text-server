@@ -24,7 +24,7 @@ const chatroomSchema = mongoose.Schema(
       trim: true,
     },
     seenHistory: {
-      type: Map,
+      type: Object,
       of: String,
     },
     time: {

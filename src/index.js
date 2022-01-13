@@ -91,6 +91,10 @@ io.on('connect', (socket) => {
     socket.broadcast.to(message.chatroomId).emit('receive-chatroom-name', newName, message);
     io.to(message.chatroomId).emit(`receive-message-${message.chatroomId}`, message, sender);
   });
+
+  socket.on('send-seen-message', (chatroomId, seenHistory) => {
+    socket.to(chatroomId).emit('receive-seen-message', chatroomId, seenHistory);
+  });
 });
 
 mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {

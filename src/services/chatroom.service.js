@@ -206,7 +206,7 @@ const updateSeenHistory = async (userIdMessageId, chatroomId) => {
   if (!chatroom) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Chatroom not found');
   }
-  Object.assign(chatroom.updateSeenHistory, userIdMessageId);
+  chatroom.seenHistory = { ...chatroom.seenHistory, ...userIdMessageId };
   await chatroom.save();
   return chatroom;
 };
