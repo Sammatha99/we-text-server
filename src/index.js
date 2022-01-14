@@ -6,6 +6,8 @@ const config = require('./config/config');
 const logger = require('./config/logger');
 const { userService, chatroomService } = require('./services');
 
+const PORT = process.env.PORT || config.PORT;
+
 const server = http.createServer(app);
 
 const usersLogin = [];
@@ -99,9 +101,8 @@ io.on('connect', (socket) => {
 
 mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
   logger.info('Connected to MongoDB');
-  // server = app.listen(config.port, () => {
-  server.listen(config.port, () => {
-    logger.info(`Listening to port ${config.port}`);
+  server.listen(PORT, () => {
+    logger.info(`Listening to port ${PORT}`);
   });
 });
 
