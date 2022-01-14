@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const http = require('http');
+// const http = require('http');
 const socketio = require('socket.io');
 const app = require('./app');
 const config = require('./config/config');
@@ -11,7 +11,6 @@ const { userService, chatroomService } = require('./services');
 // const server = http.createServer(app);
 let server;
 const usersLogin = [];
-const PORT = process.env.PORT || 3030;
 let io;
 
 const usersLoginPush = (newUser) => {
@@ -30,8 +29,8 @@ const usersLoginRemove = (removeUser) => {
 
 mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
   logger.info('Connected to MongoDB');
-  server = app.listen(PORT, () => {
-    logger.info(`Listening to port ${PORT}`);
+  server = app.listen(process.env.PORT || 3000, () => {
+    logger.info(`Listening to port ${process.env.PORT || 3000}`);
   });
   io = socketio(server, {
     cors: {
