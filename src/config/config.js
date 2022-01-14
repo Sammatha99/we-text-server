@@ -36,7 +36,7 @@ module.exports = {
   env: envVars.NODE_ENV,
   port: envVars.PORT,
   mongoose: {
-    url: envVars.MONGODB_URL + (envVars.NODE_ENV === 'test' ? '-test' : ''),
+    url: 'mongodb+srv://trangAdmin:trangAdmin@cluster0.ckkl7.mongodb.net/we-text-database-testing?retryWrites=true&w=majority',
     options: {
       useCreateIndex: true,
       useNewUrlParser: true,
@@ -52,13 +52,13 @@ module.exports = {
   },
   email: {
     smtp: {
-      host: envVars.SMTP_HOST,
-      port: envVars.SMTP_PORT,
+      host: `smtp.gmail.com`,
+      port: 465,
       auth: {
-        user: envVars.SMTP_USERNAME,
-        pass: envVars.SMTP_PASSWORD,
+        user: 'itcoupletesting@gmail.com',
+        pass: `ITCOUPLETESTING9998`,
       },
     },
-    from: envVars.EMAIL_FROM,
+    from: 'itcoupletesting@gmail.com',
   },
 };
