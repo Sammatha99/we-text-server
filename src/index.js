@@ -24,7 +24,7 @@ let server;
 //   }
 // };
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3030;
 mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
   logger.info('Connected to MongoDB');
   server = app.listen(PORT, () => {
