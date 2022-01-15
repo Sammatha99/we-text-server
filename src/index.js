@@ -32,7 +32,7 @@ mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
   });
   io = socketio(server, {
     cors: {
-      origin: ['http://localhost:3006'],
+      origin: ['https://we-text-client-opjzd36qz-sammatha99.vercel.app/'],
     },
   });
   io.on('connect', (socket) => {
